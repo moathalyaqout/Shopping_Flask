@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ product.name }} - Eco-friendly Goods
+{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        margin: 20px;
+    }
+
+    .cart-info {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
+
+    .fa-shopping-cart {
+        margin-right: 10px;
+        color: green;
+    }
+
+    #cart-count {
+        background-color: green;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 1em;
+    }
+
+    .product-image {
+        max-width: 300px;
+        width: 100%;
+        height: auto;
+        padding: 10px;
+    }
+
+    .product-details {
+        max-width: 500px;
+        margin: 10px;
+        padding: 10px;
+        flex-grow: 1;
+    }
+
+    .reviews-section {
+        margin-top: 20px;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .review {
+        padding: 10px;
+        background: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+    }
+
+    .review h5 {
+        color: #4CAF50;
+        margin-bottom: 5px;
+    }
+
+    .review p {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .review-time {
+        font-size: 0.8rem;
+        color: #aaa;
+        text-align: right;
+    }
+
+    textarea, input[type="number"] {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin-top: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+    <div class="product-details">
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        <p>Price: ${{ product.price }}</p>
+        <p>Environmental Impact: {{ product.environmental_impact }}</p>
+        <button onclick="addToCart({{ product.id }})">Add to Basket</button>
+    </div>
+    <div class="cart-info">
+        <i class="fa fa-shopping-cart"></i>
+        <span id="cart-count">{{ total_items }}</span>
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<section class="reviews-section">
+    <h2>Customer Reviews</h2>
+    {% for review in reviews %}
+    <div class="review">
+        <h5>{{ review.user.username }}</h5>
+        <p>{{ review.content }}</p>
+        <p class="review-time">{{ review.time.strftime("%B %d, %Y") }}</p>
+    </div>
+    {% else %}
+    <p>No reviews yet.</p>
+    {% endfor %}
+    <form method="POST">
+        <textarea name="content" placeholder="Write a review..." required></textarea>
+        <input type="number" name="rating" placeholder="Rating (1-5)" required min="1" max="5">
+        <button type="submit">Submit Review</button>
+    </form>
+</section>
+
+<script>
+function addToCart(productId) {
+    $.ajax({
+        url: '/add-to-cart/' + productId,
+        method: 'POST',
+        success: function(response) {
+            $('#cart-count').text(response.cartCount); // Update the cart count displayed
+        },
+        error: function() {
+            alert('Error adding item to cart. Please try again.');
+        }
+    });
+}
+</script>
+{% endblock %}

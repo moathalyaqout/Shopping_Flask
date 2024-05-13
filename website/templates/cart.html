@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}
+Eco-friendly Goods
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f7f7f7;  /* Soft background to ease the eye strain */
+    }
+
+    .hero-section {
+        padding: 40px 20px;
+        text-align: center;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+    #cart-section {
+        padding: 20px;
+        text-align: center;
+        max-width: 800px;
+        margin: 20px auto;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-radius: 8px;
+    }
+
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #ececec;
+        padding: 15px;
+        width: 100%;
+    }
+
+    .item-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .item-info h4, .item-info p {
+        margin: 5px 0; /* Uniform spacing for all text */
+    }
+
+    .item-buttons {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-danger {
+        background-color: #e3342f;
+    }
+
+    .btn-danger:hover {
+        background-color: #cc1f1a;
+    }
+
+    .btn-warning {
+        background-color: #f9ac19;
+    }
+
+    .btn-warning:hover {
+        background-color: #e19b0d;
+    }
+
+    .btn-success {
+        background-color: #38c172;
+    }
+
+    .btn-success:hover {
+        background-color: #1ca34a;
+    }
+
+    .cart-total {
+        text-align: center;
+        padding-top: 20px;
+    }
+
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <h1>Welcome to Our Eco-friendly Store!</h1>
+    <p>Discover products that are good for the planet.</p>
+</section>
+
+<!-- Shopping Cart -->
+<section id="cart-section">
+    <h1>Your Shopping Cart</h1>
+    <div class="cart-items">
+        {% for item in items %}
+        <div class="cart-item">
+            <img src="{{ item.image }}" alt="{{ item.name }}" style="height: 100px; width: auto; margin-right: 20px;">
+            <div class="item-info">
+                <h4>{{ item.name }} - ${{ item.price }}</h4>
+                <p>Quantity: {{ item.quantity }}</p>
+                <div class="item-buttons">
+                    <button onclick="removeFromCart({{ item.cartProduct_Id }})" class="btn btn-danger">Remove</button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>Your cart is empty!</p>
+        {% endfor %}
+    </div>
+    <div class="cart-total">
+<h2>Total: $<span id="total-price">{{ total }}</span></h2>
+        <button onclick="checkout()" class="btn btn-success">Checkout</button>
+        <button onclick="clearCart()" class="btn btn-warning">Clear Cart</button>
+    </div>
+</section>
+
+<script>
+function removeFromCart(cartProductId) {
+    $.ajax({
+        url: '/remove-from-cart/' + cartProductId,
+        method: 'POST',
+        success: function(response) {
+            location.reload(); // Optionally remove the item from the DOM or refresh the page
+        },
+        error: function(response) {
+            alert('Failed to remove item. Please try again.');
+        }
+    });
+}
+
+function clearCart() {
+    var totalPrice = parseFloat(document.getElementById('total-price').textContent);
+    if (totalPrice === 0) {
+        alert("Your cart is empty. Please add some products before clearing");
+        return; // Prevent the function from redirecting to the checkout page.
+    }else{
+        $.ajax({
+        url: '/clear-cart',
+        method: 'POST',
+        success: function(response) {
+            location.reload();
+        }
+    });
+    }
+
+}
+
+function checkout() {
+    var totalPrice = parseFloat(document.getElementById('total-price').textContent);
+    if (totalPrice === 0) {
+        alert("Your cart is empty. Please add some products before checking out.");
+        return; // Prevent the function from redirecting to the checkout page.
+    }
+    window.location.href = '/checkout'; // Proceed to checkout if the total is not zero.
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}
+Checkout
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif; /* Smooth, sans-serif font */
+        background-color: #f7f7f7; /* Light grey background for slight contrast */
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        text-align: center;
+        background-color: #ffffff; /* Pure white background */
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+        margin-top: 50px; /* Adds space at the top of the form */
+    }
+
+    input, button {
+        margin-top: 15px;
+        padding: 12px 20px;
+        width: 90%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Includes padding in width */
+    }
+
+    button {
+        background-color: #4CAF50; /* A nice shade of green */
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #45a049; /* A darker shade for hover effect */
+    }
+
+    h1 {
+        color: #333; /* Dark grey for the title, providing contrast */
+    }
+</style>
+
+<section class="container">
+    <h1>Checkout</h1>
+    <form id="payment-form">
+        <input type="text" id="card-name" placeholder="Cardholder Name" required>
+        <input type="text" id="card-number" placeholder="Card Number" required pattern="\d{16}">
+        <input type="text" id="card-expiration" placeholder="Expiration Date (MM/YY)" required pattern="\d{2}/\d{2}">
+        <input type="text" id="card-cvc" placeholder="CVC" required pattern="\d{3}">
+        <button type="submit">Confirm Payment</button>
+    </form>
+</section>
+
+<script>
+document.getElementById('payment-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting through the browser
+
+    var cardName = document.getElementById('card-name').value;
+    var cardNumber = document.getElementById('card-number').value;
+    var cardExpiration = document.getElementById('card-expiration').value;
+    var cardCVC = document.getElementById('card-cvc').value;
+
+    if (!cardName || !cardNumber || !cardExpiration || !cardCVC) {
+        alert('Please fill in all fields.');
+        return;
+    }
+
+    if (cardNumber.length !== 16 || isNaN(cardNumber)) {
+        alert('Invalid card number. Must be 16 digits.');
+        return;
+    }
+    if (!cardExpiration.match(/^\d{2}\/\d{2}$/)) {
+        alert('Invalid expiration date. Format should be MM/YY.');
+        return;
+    }
+    if (cardCVC.length !== 3 || isNaN(cardCVC)) {
+        alert('Invalid CVC. Must be 3 digits.');
+        return;
+    }
+
+    clearCartAndRedirect();
+});
+
+function clearCartAndRedirect() {
+    $.ajax({
+        url: '/clear-cart',
+        method: 'POST',
+        success: function(response) {
+            alert('Thank you for your payment! Your cart has been cleared.');
+            window.location.href = '/'; // Redirect to the homepage
+        },
+        error: function() {
+            alert('There was an error clearing the cart. Please check your network connection.');
+        }
+    });
+}
+</script>
+{% endblock %}

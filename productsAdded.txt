@@ -1,0 +1,55 @@
+product1 = Product(
+        name="Biodegradable Bamboo Toothbrush",
+        image="https://darjeelingconnection.com/cdn/shop/products/1-1-scaled.jpg?v=1660728375&width=1946",
+        description="Made from sustainably harvested bamboo, this toothbrush is completely biodegradable and compostable.",
+        price=4.99,
+        environmental_impact=20
+    )
+
+    product2 = Product(
+        name="Organic Cotton Reusable Bags",
+        image="https://cdn11.bigcommerce.com/s-9geauonp44/images/stencil/2048x2048/products/635/2271/E02BF6B7-3157-49DB-B6C1-093134C9A77C__84322.1627043229.jpg?c=2",
+        description="Reusable bags crafted from 100% organic cotton, perfect for grocery shopping and reducing single-use plastic bags.",
+        price=15.00,
+        environmental_impact=30
+    )
+
+    product3 = Product(
+        name="Solar Powered LED Garden Light",
+        image="https://m.media-amazon.com/images/I/81zRQP+eXLL._AC_UF1000,1000_QL80_.jpg",
+        description="Outdoor garden lights powered by solar energy, providing efficient lighting with minimal environmental impact.",
+        price=29.99,
+        environmental_impact=10
+    )
+
+    product4 = Product(
+        name="Eco-Friendly Laundry Detergent Pods",
+        image="https://m.media-amazon.com/images/I/81ItMZWJM+L._AC_SL1500_.jpg",
+        description="Detergent pods made from naturally derived ingredients, free from harmful chemicals and packaged in dissolvable films.",
+        price=19.99,
+        environmental_impact=70
+    )
+
+    product5 = Product(
+        name="Recycled Paper Notebooks",
+        image="https://saahaszerowaste.com/wp-content/uploads/2017/01/Recycled-Paper-Notebook.jpg",
+        description="Notebooks made from 100% post-consumer recycled paper, ideal for writing and drawing.",
+        price=12.00,
+        environmental_impact=25
+    )
+
+    product6 = Product(
+        name="Plant-Based Compostable Phone Case",
+        image="https://m.media-amazon.com/images/I/81IND1+HREL.jpg",
+        description="Phone case made from plant-based materials that are compostable, offering good protection and sustainability.",
+        price=25.00,
+        environmental_impact=90
+    )
+
+    db.session.add(product1)
+    db.session.add(product2)
+    db.session.add(product3)
+    db.session.add(product4)
+    db.session.add(product5)
+    db.session.add(product6)
+    db.session.commit()

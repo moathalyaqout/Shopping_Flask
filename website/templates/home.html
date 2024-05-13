@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}
+Eco-friendly Goods
+{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f5f5f5; /* Light gray background for the whole page */
+    }
+
+    .hero-section {
+        padding: 20px;
+        text-align: center;
+        background-color: #e2e2e2;
+        margin-bottom: 20px;
+    }
+
+    .shopping-cart {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    #cart-count {
+        background-color: green;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        margin-left: 10px;
+    }
+
+    #sorting {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    #products {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .product-card {
+        background-color: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+        padding: 10px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px); /* Slight raise effect on hover */
+    }
+
+    .product-card img {
+        width: 100%;
+        height: auto;
+        border-bottom: 1px solid #eee;
+    }
+
+    .product-card h3 {
+        color: #333;
+        padding: 5px;
+    }
+
+    .product-card p {
+        color: #666;
+    }
+
+    .product-card button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        bottom: 10px;
+    }
+
+    .add-to-basket {
+        right: 10px;
+        color: green;
+    }
+
+    .view-details {
+        left: 10px;
+        color: blue;
+    }
+
+    .fa-plus, .fa-eye {
+        font-size: 1.2rem;
+    }
+</style>
+
+<!-- Hero Section -->
+<section id="hero">
+    <h1>Welcome to Our Eco-friendly Store!</h1>
+    <p>Discover products that are good for the planet.</p>
+</section>
+
+<!-- Sorting and Cart Icon -->
+<div id="sorting">
+    <label for="sort">Sort By:</label>
+    <select id="sort">
+        <option value="name">Name</option>
+        <option value="price">Price</option>
+        <option value="environmental_impact">Environmental Impact</option>
+    </select>
+    <div class="shopping-cart">
+        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+        <span id="cart-count">{{ total_items }}</span>
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div id="products">
+    {% for product in products %}
+    <div class="product-card">
+        <img src="{{ product.image }}" alt="{{ product.name }}">
+        <h3>{{ product.name }}</h3>
+        <p>Price: ${{ product.price }}</p>
+        <button data-id="{{ product.id }}" class="add-to-basket">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+        <button data-id="{{ product.id }}" class="view-details">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+        </button>
+        <div class="details" style="display: none; position: absolute; background-color: white; border: 1px solid black; top: 0; left: 0; width: 100%; padding: 10px;">
+            <!-- Details will be loaded here on hover -->
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+$(document).ready(function() {
+
+    $('#products').on('mouseenter', '.product-card', function() {
+        const card = $(this);
+        const detailsDiv = card.find('.details');
+        const productId = card.find('.add-to-basket').data('id');
+
+        clearTimeout(detailsDiv.data('timeoutId'));
+
+        var timeoutId = setTimeout(function() {
+            $.ajax({
+                url: `/product-details/${productId}`,
+                type: 'GET',
+                success: function(data) {
+                    detailsDiv.html(
+                        `<h4>Details</h4>` +
+                        `<p style="font-size: 10px;">Description: ${data.description}</p>` +
+                        `<p>Impact: ${data.impact}</p>` +
+                        `<p><img src="${data.image}" alt="${data.name}" style="width: 70%;"></p>`
+                    );
+                    detailsDiv.show();
+                }
+            });
+        }, 500); // Delay in milliseconds before showing details
+        detailsDiv.data('timeoutId', timeoutId);
+    }).on('mouseleave', '.product-card', function() {
+        const detailsDiv = $(this).find('.details');
+        clearTimeout(detailsDiv.data('timeoutId'));
+        detailsDiv.hide();
+    });
+
+    $('#sort').change(function() {
+        var sortBy = $(this).val();
+        var direction = 'asc'; // or 'desc', you could also add a toggle for this
+
+        $.ajax({
+            url: '/sort-products',
+            type: 'GET',
+            data: { sort: sortBy, direction: direction },
+            success: function(response) {
+                var productsDiv = $('#products');
+                productsDiv.empty(); // Clear the current content
+
+                response.forEach(function(product) {
+                    productsDiv.append(
+                        `<div class="product-card">
+        <img src="${ product.image }" alt="${ product.name }">
+        <h3>${ product.name }</h3>
+        <p>Price: ${ product.price }</p>
+        <button data-id="${ product.id }" class="add-to-basket">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+        <button data-id="${ product.id }" class="view-details">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+        </button>
+        <div class="details" style="display: none; position: absolute; background-color: white; border: 1px solid black; top: 0; left: 0; width: 100%; padding: 10px;">
+            <!-- Details will be loaded here on hover -->
+        </div>
+    </div>`
+                    );
+                });
+            },
+            error: function() {
+                alert('Failed to fetch sorted products. Please try again.');
+            }
+        });
+    });
+
+    $('#products').on('click', '.add-to-basket', function() {
+        const productId = $(this).data('id');
+
+        $.ajax({
+            url: '/add-to-cart/' + productId,
+            method: 'POST',
+            success: function(response) {
+                $('#cart-count').text(response.cartCount);  // Update the cart count displayed
+            },
+            error: function() {
+                alert('Error adding item to cart. Please try again.');
+            }
+        });
+    });
+
+    $('#products').on('click', '.view-details', function() {
+        var productId = $(this).data('id');
+        window.location.href = '/product/' + productId; // Redirects to the Flask endpoint
+    });
+
+});
+</script>
+
+
+{% endblock %}
